@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+// import { db } from "@vercel/postgres";
 import {
   CustomerField,
   CustomersTableType,
@@ -9,7 +10,14 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
+
+// async function connectToDb() {
+//   const client = await db.connect();
+//   return client;
+// }
 export async function fetchRevenue() {
+    // const client = await connectToDb();
+
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
@@ -26,9 +34,13 @@ export async function fetchRevenue() {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
   }
+  // finally {
+  //   client.release(); // Release the client back to the pool
+  // }
 }
 
 export async function fetchLatestInvoices() {
+  // const client = await connectToDb();
   try {
     const data = await sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -46,6 +58,9 @@ export async function fetchLatestInvoices() {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');
   }
+  // finally {
+  //   client.release(); // Release the client back to the pool
+  // }
 }
 
 export async function fetchCardData() {
