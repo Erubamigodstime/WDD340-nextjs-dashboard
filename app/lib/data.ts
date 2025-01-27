@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-// import { db } from "@vercel/postgres";
+import { db } from "@vercel/postgres";
 import {
   CustomerField,
   CustomersTableType,
@@ -11,12 +11,12 @@ import {
 import { formatCurrency } from './utils';
 
 
-// async function connectToDb() {
-//   const client = await db.connect();
-//   return client;
-// }
+async function connectToDb() {
+  const client = await db.connect();
+  return client;
+}
 export async function fetchRevenue() {
-    // const client = await connectToDb();
+    const client = await connectToDb();
 
   try {
     // Artificially delay a response for demo purposes.
@@ -25,7 +25,7 @@ export async function fetchRevenue() {
     // console.log('Fetching revenue data...');
     // await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    const data = await sql<Revenue>`SELECT * FROM revenue`;
+    const data = await client.sql<Revenue>`SELECT * FROM revenue`;
 
     // console.log('Data fetch completed after 3 seconds.');
 
@@ -34,15 +34,15 @@ export async function fetchRevenue() {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
   }
-  // finally {
-  //   client.release(); // Release the client back to the pool
-  // }
+  finally {
+    client.release();
+  }
 }
 
 export async function fetchLatestInvoices() {
-  // const client = await connectToDb();
+  const client = await connectToDb();
   try {
-    const data = await sql<LatestInvoiceRaw>`
+    const data = await client.sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
@@ -57,10 +57,9 @@ export async function fetchLatestInvoices() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');
+  }finally {
+    client.release(); 
   }
-  // finally {
-  //   client.release(); // Release the client back to the pool
-  // }
 }
 
 export async function fetchCardData() {
